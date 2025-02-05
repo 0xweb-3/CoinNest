@@ -7,8 +7,6 @@ service Eth{
   rpc GetUserById(GetUserByIdReq) returns(UserInfo);
 }
 
-
-
 message  UserInfo{
   uint64 id = 1;
   string phone = 3;

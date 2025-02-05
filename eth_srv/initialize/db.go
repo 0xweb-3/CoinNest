@@ -1,21 +1,32 @@
-package main
+package initialize
 
 import (
 	"fmt"
-	"github.com/0xweb-3/CoinNest/eth_srv/model"
+	"github.com/0xweb-3/CoinNest/eth_srv/global"
+	"go.uber.org/zap"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
 	"log"
 	"os"
 	"time"
-
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
-func OpenDB() (*gorm.DB, error) {
+func InitDB() {
 	// 参考 https://github.com/go-sql-driver/mysql#dsn-data-source-name 获取详情
-	dsn := "root:xin1234567890@tcp(192.168.21.2:3320)/coin_nest?charset=utf8mb4&parseTime=True&loc=Local"
+	//dsn := "root:xinbingliang@tcp(192.168.21.2:3310)/fishline?charset=utf8mb4&parseTime=True&loc=Local"
+	cnf := global.ServerConfig.Mysql
+	dsn := fmt.Sprintf(
+		"%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		cnf.Username,
+		cnf.Password,
+		cnf.Host,
+		cnf.Port,
+		cnf.DbName,
+	)
+
+	zap.S().Debug(dsn)
 	// 设置全局的logger，这个logger在我们执行每个sql语句的时候会打印每一行sql
 
 	newLogger := logger.New(
@@ -28,8 +39,8 @@ func OpenDB() (*gorm.DB, error) {
 			Colorful: true, // 是否禁用彩色打印
 		},
 	)
-
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	var err error
+	global.DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger: newLogger, //设置全局的日志级别
 		NamingStrategy: schema.NamingStrategy{
 			SingularTable: true, //去除表明后的s
@@ -38,37 +49,4 @@ func OpenDB() (*gorm.DB, error) {
 	if err != nil {
 		panic(err)
 	}
-
-	return db, err
-}
-
-func main() {
-	db, err := OpenDB()
-	if err != nil {
-		panic(err)
-	}
-	// 迁移生成表
-	err = db.AutoMigrate(&model.User{})
-	if err != nil {
-		panic(err)
-	}
-
-	for i := 0; i < 2; i++ {
-		//now := time.Now()
-		db.Create(&model.User{
-			Nickname: fmt.Sprintf("xin-%d", i),
-			Phone:    fmt.Sprintf("%d", 15102724518+i),
-		})
-	}
-
-	//fmt.Println(db)
-
-	//var user model.User
-	//db.First(&user)
-	//
-	//db.Model(&user).Update("Password", "xin")
-	//fmt.Println(user.Password)
-
-	//fmt.Println(crypto.CompareHash(user.Password, "123456"))
-
 }
