@@ -1,0 +1,21 @@
+syntax = "proto3";
+option go_package = ".;proto";
+
+//import "google/protobuf/empty.proto";
+
+service Eth{
+  rpc GetUserById(GetUserByIdReq) returns(UserInfo);
+}
+
+
+
+message  UserInfo{
+  uint64 id = 1;
+  string phone = 3;
+  string nickname = 4;
+}
+
+
+message GetUserByIdReq{
+  uint64 id = 1;
+}
