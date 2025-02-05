@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  mysql:
+    image: mysql:5.7
+    restart: always
+    platform: linux/amd64
+    environment:
+      MYSQL_ROOT_PASSWORD: xin1234567890
+      MYSQL_DATABASE: coin_nest
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION_SERVER: utf8mb4_unicode_ci
+    ports:
+      - "3320:3306"
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - CoinNest_net
+
+  redis:
+    image: redis
+    restart: always
+    platform: linux/amd64
+    ports:
+      - "6388:6379"
+    networks:
+      - CoinNest_net
+
+#  consul:
+#    image: hashicorp/consul:1.16.1
+#    restart: always
+#    #    platform: linux/amd64
+#    command: agent -dev -client=0.0.0.0
+#    ports:
+#      - "8500:8500"
+#      - "8300:8300"
+#      - "8301:8301"
+#      - "8302:8302"
+#      - "8600:8600/udp"
+#    networks:
+#      - CoinNest_net
+
+networks:
+  CoinNest_net:
