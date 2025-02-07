@@ -47,11 +47,11 @@ func BuildErc721Data(fromAddress, toAddress common.Address, tokenId *big.Int) []
 }
 
 // OfflinesignTx 离线签名
-func OfflinesignTx(txData *types.DynamicFeeTx, privateKey string, chainId *big.Int) (string, error) {
+func OfflineSignTx(txData *types.DynamicFeeTx, privateKey string, chainId *big.Int) (string, string, error) {
 	privateKeyEcdsa, err := crypto.HexToECDSA(privateKey)
 
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	tx := types.NewTx(txData)
 	signer := types.LatestSignerForChainID(chainId)
@@ -59,13 +59,14 @@ func OfflinesignTx(txData *types.DynamicFeeTx, privateKey string, chainId *big.I
 	signedTx, err := types.SignTx(tx, signer, privateKeyEcdsa)
 
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	signedTxData, err := rlp.EncodeToBytes(signedTx)
 
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
-	return "0x" + hex.EncodeToString(signedTxData)[6:], err
+	//return "0x" + hex.EncodeToString(signedTxData)[6:], err
+	return "0x" + hex.EncodeToString(signedTxData), signedTx.Hash().String(), nil
 }
